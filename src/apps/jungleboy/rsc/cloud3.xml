@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Animation ColorKey="0">
+  <Flag Name="Mass" Value="0"/>
+  <Flag Name="Volatile" Value="YES"/>
+  <Sequence>
+    <Frame Image="rsc/cloud3.bmp" Duration="1000"/>
+  </Sequence>
+</Animation>

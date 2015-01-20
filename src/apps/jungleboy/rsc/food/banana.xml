@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Animation ColorKey="0">
+  <Flag Name="Mass" Value="1"/>
+  <Flag Name="Volatile" Value="1"/>
+  <Sequence Name="0" BaseVelocity="0">
+    <Frame Image="rsc/food/banana.bmp" Duration="1000"/>
+  </Sequence>
+</Animation>

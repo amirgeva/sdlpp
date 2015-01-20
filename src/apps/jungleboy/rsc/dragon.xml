@@ -1,0 +1,24 @@
+<Animation ColorKey="0">
+  <Flag Name="Mass" Value="1"/>
+  <Flag Name="AnimDir" Value="X"/>
+  <Sequence BaseVelocity="100" Name="0">
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="0,0,104,46"/>
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="104,0,208,46"/>
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="208,0,312,46"/>
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="312,0,416,46"/>
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="416,0,520,46"/>
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="520,0,624,46"/>
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="624,0,728,46"/>
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="728,0,832,46"/>
+  </Sequence>
+  <Sequence BaseVelocity="100" Name="1">
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="0,46,104,92"/>
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="104,46,208,92"/>
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="208,46,312,92"/>
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="312,46,416,92"/>
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="416,46,520,92"/>
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="520,46,624,92"/>
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="624,46,728,92"/>
+    <Frame Duration="100" Image="rsc/dragon.bmp" Rect="728,46,832,92"/>
+  </Sequence>
+</Animation>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Animation ColorKey="0">
+  <Flag Name="Mass" Value="20"/>
+  <Flag Name="Volatile" Value="YES"/>
+  <Flag Name="AnimDir" Value="X"/>
+  <Sequence Name="walking_left" BaseVelocity="100">
+    <Frame Image="rsc/ogre_left.bmp" Rect="4,4,54,56" Duration="100"/>
+    <Frame Image="rsc/ogre_left.bmp" Rect="60,4,108,54" Duration="100"/>
+    <Frame Image="rsc/ogre_left.bmp" Rect="116,4,160,54" Duration="100"/>
+    <Frame Image="rsc/ogre_left.bmp" Rect="171,4,221,52" Duration="100"/>
+  </Sequence>
+  <Sequence Name="walking_right" BaseVelocity="100">
+    <Frame Image="rsc/ogre_right.bmp" Rect="4,4,54,56" Duration="100"/>
+    <Frame Image="rsc/ogre_right.bmp" Rect="62,4,106,54" Duration="100"/>
+    <Frame Image="rsc/ogre_right.bmp" Rect="117,4,165,54" Duration="100"/>
+    <Frame Image="rsc/ogre_right.bmp" Rect="175,4,225,52" Duration="100"/>
+  </Sequence>
+  <Sequence Name="hit_left">
+    <Frame Image="rsc/ogre_hit_left.bmp" Rect="4,4,48,54" Duration="100"/>
+    <Frame Image="rsc/ogre_hit_left.bmp" Rect="82,2,128,54" Duration="100"/>
+    <Frame Image="rsc/ogre_hit_left.bmp" Rect="157,2,227,48" Duration="100"/>
+  </Sequence>
+  <Sequence Name="hit_right">
+    <Frame Image="rsc/ogre_hit_right.bmp" Rect="4,4,48,54" Duration="100"/>
+    <Frame Image="rsc/ogre_hit_right.bmp" Rect="79,2,125,54" Duration="100"/>
+    <Frame Image="rsc/ogre_hit_right.bmp" Rect="157,2,227,48" Duration="100"/>
+  </Sequence>
+</Animation>

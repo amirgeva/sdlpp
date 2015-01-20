@@ -1,0 +1,28 @@
+<Animation ColorKey="0">
+  <Flag Name="Mass" Value="1"/>
+  <Flag Name="Volatile" Value="YES"/>
+  <Sequence>
+    <Frame Duration="1000" Image="rsc/bgrass.bmp" Rect="0,0,32,32"/>
+  </Sequence>
+  <Sequence>
+    <Frame Duration="1000" Image="rsc/bgrass.bmp" Rect="0,32,32,64"/>
+  </Sequence>
+  <Sequence>
+    <Frame Duration="1000" Image="rsc/bgrass.bmp" Rect="0,64,32,96"/>
+  </Sequence>
+  <Sequence>
+    <Frame Duration="1000" Image="rsc/bgrass.bmp" Rect="0,96,32,128"/>
+  </Sequence>
+  <Sequence>
+    <Frame Duration="1000" Image="rsc/bgrass.bmp" Rect="0,128,32,160"/>
+  </Sequence>
+  <Sequence>
+    <Frame Duration="1000" Image="rsc/bgrass.bmp" Rect="0,160,32,192"/>
+  </Sequence>
+  <Sequence Name="Left">
+    <Frame Duration="1000" Image="rsc/bgrass.bmp" Rect="0,192,32,224"/>
+  </Sequence>
+  <Sequence Name="Right">
+    <Frame Duration="1000" Image="rsc/bgrass.bmp" Rect="0,224,32,256"/>
+  </Sequence>
+</Animation>

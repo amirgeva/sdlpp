@@ -1,0 +1,16 @@
+<Animation ColorKey="0">
+  <Flag Name="Mass" Value="0"/>
+  <Flag Name="Volatile" Value="YES"/>
+  <Sequence BaseVelocity="100" Name="FlyingShoes">
+    <Frame Duration="1000" Image="rsc/pickup.bmp" Rect="0,0,34,16"/>
+  </Sequence>
+  <Sequence BaseVelocity="100" Name="NextScreen">
+    <Frame Duration="1000" Image="rsc/pickup.bmp" Rect="0,30,30,52"/>
+  </Sequence>
+  <Sequence BaseVelocity="100" Name="ExtraLife">
+    <Frame Duration="1000" Image="rsc/pickup.bmp" Rect="0,60,22,82"/>
+  </Sequence>
+  <Sequence BaseVelocity="100" Name="Shield">
+    <Frame Duration="1000" Image="rsc/pickup.bmp" Rect="0,90,28,120"/>
+  </Sequence>
+</Animation>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Animation ColorKey="0">
+  <Flag Name="Mass" Value="10"/>
+  <Flag Name="AnimDir" Value="X"/>
+  <Sequence Name="walking" BaseVelocity="200">
+    <Frame Image="rsc/boy.bmp" Rect="51,4,89,64" Duration="100"/>
+    <Frame Image="rsc/boy.bmp" Rect="101,4,137,62" Duration="100"/>
+    <Frame Image="rsc/boy.bmp" Rect="151,4,183,64" Duration="100"/>
+    <Frame Image="rsc/boy.bmp" Rect="201,4,241,62" Duration="100"/>
+    <Frame Image="rsc/boy.bmp" Rect="248,4,290,62" Duration="100"/>
+    <Frame Image="rsc/boy.bmp" Rect="298,4,336,62" Duration="100"/>  
+  </Sequence>
+  <Sequence>
+    <Frame Image="rsc/rboy.bmp" Rect="0,4,36,62" Duration="1000"/>
+  </Sequence>
+  <Sequence Name="walking_left" BaseVelocity="200">
+    <Frame Image="rsc/lboy.bmp" Rect="299,1,339,59" Duration="100"/>
+    <Frame Image="rsc/lboy.bmp" Rect="252,1,284,61" Duration="100"/>
+    <Frame Image="rsc/lboy.bmp" Rect="202,1,240,61" Duration="100"/>
+    <Frame Image="rsc/lboy.bmp" Rect="152,4,194,62" Duration="100"/>
+    <Frame Image="rsc/lboy.bmp" Rect="104,4,142,62" Duration="100"/>
+    <Frame Image="rsc/lboy.bmp" Rect="54,4,90,62" Duration="100"/>
+  </Sequence>
+  <Sequence>
+    <Frame Image="rsc/lboy.bmp" Rect="350,3,390,62" Duration="1000"/>
+  </Sequence>
+  <Sequence>
+    <Frame Image="rsc/dying.bmp" Rect="0,0,48,60" Duration="50"/>
+    <Frame Image="rsc/dying.bmp" Rect="48,0,96,60" Duration="50"/>
+    <Frame Image="rsc/dying.bmp" Rect="96,0,144,60" Duration="50"/>
+    <Frame Image="rsc/dying.bmp" Rect="144,0,192,60" Duration="50"/>
+    <Frame Image="rsc/dying.bmp" Rect="192,0,240,60" Duration="50"/>
+    <Frame Image="rsc/dying.bmp" Rect="240,0,288,60" Duration="50"/>
+    <Frame Image="rsc/dying.bmp" Rect="288,0,336,60" Duration="50"/>
+    <Frame Image="rsc/dying.bmp" Rect="336,0,384,60" Duration="50"/>
+    <Frame Image="rsc/dying.bmp" Rect="384,0,432,60" Duration="50"/>
+    <Frame Image="rsc/dying.bmp" Rect="432,0,480,60" Duration="50"/>
+    <Frame Image="rsc/dying.bmp" Rect="480,0,528,60" Duration="50"/>
+    <Frame Image="rsc/dying.bmp" Rect="528,0,576,60" Duration="50"/>
+  </Sequence>
+  <Sequence Name="bend_right" BaseVelocity="0">
+    <Frame Image="rsc/boy.bmp" Rect="350,4,386,62" Duration="100"/>
+  </Sequence>
+  <Sequence Name="bend_left" BaseVelocity="0">
+    <Frame Image="rsc/lboy.bmp" Rect="396,4,432,62" Duration="100"/>
+  </Sequence>
+</Animation>

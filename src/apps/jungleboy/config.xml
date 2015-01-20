@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+  <screen full="NO"/>
+  <difficulty easy="YES"/>
+  <joystick enable="NO"/>
+</config>
