@@ -19,7 +19,10 @@
 #include <xstring.h>
 #include <SDL.h>
 
-#define THROW(x) { std::ostringstream os; os << __FILE__ << ":" << __LINE__ << " - " << x; throw xstring(os.str()); }
+#define THROW(x) {\
+  std::ostringstream os; os << __FILE__ << ":" << __LINE__ << " - " << x;\
+  display_message(os.str());\
+  throw xstring(os.str()); }
 
 namespace SDLPP {
 

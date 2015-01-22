@@ -30,7 +30,8 @@ public:
     *this=os.str();
   }
 
-  operator const value_type* () { return parent::c_str(); }
+  operator const value_type* () const { return parent::c_str(); }
+
   int as_int() const
   {
     return atoi(parent::c_str());
@@ -58,6 +59,18 @@ public:
   {
     trim_left();
     trim_right();
+  }
+
+  bool starts_with(const self& sub) const
+  {
+    if (parent::size() < sub.size()) return false;
+    return parent::substr(0, sub.size()) == sub;
+  }
+
+  bool ends_with(const self& sub) const
+  {
+    if (parent::size() < sub.size()) return false;
+    return parent::substr(parent::size() - sub.size()) == sub;
   }
 
   bool read_line(std::istream& is)

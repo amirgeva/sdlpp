@@ -16,23 +16,28 @@ ResourceFile::ResourceFile(const char* filename)
 : m_Filename(filename?filename:"")
 {
   if (m_Filename.empty()) return;
-  std::ifstream f(filename,std::ios::in|std::ios::binary);
-  if (f.fail()) 
+  SDL_RWops* rw = SDL_RWFromFile(filename, "rb");
+  if (!rw) 
     THROW ("File not found: "+xstring(filename));
   char name_buffer[1024];
-  while (!f.eof())
+  size_t size = size_t(SDL_RWsize(rw));
+  SDL_RWseek(rw, 0, RW_SEEK_SET);
+  while (SDL_RWtell(rw)<size)
   {
     ResourceHeader rh;
-    f.read((char*)&rh,sizeof(ResourceHeader));
-    if (f.eof()) break;
+    SDL_RWread(rw, &rh, sizeof(ResourceHeader), 1);
+    //f.read((char*)&rh,sizeof(ResourceHeader));
+    //if (f.eof()) break;
     if (rh.name_length>1000)
       THROW("Resource name too long (max 1000)");
-    f.read(name_buffer,rh.name_length);
+    SDL_RWread(rw, name_buffer, 1, rh.name_length);
+    //f.read(name_buffer,rh.name_length);
     name_buffer[rh.name_length]=0;
     Resource r;
-    r.position=int(f.tellg());
+    r.position=int(SDL_RWtell(rw));
     r.size=rh.size;
-    f.seekg(r.size,std::ios::cur);
+    SDL_RWseek(rw, rh.size, RW_SEEK_CUR);
+    //f.seekg(r.size,std::ios::cur);
     m_Resources[name_buffer]=r;
   }
 }
@@ -46,7 +51,7 @@ class block_streambuf : public std::streambuf
   char_vec      m_Buffer;
   pos_type      m_Start,m_Current,m_Stop;
 public:
-  block_streambuf(std::istream* source, std::streamsize limit)
+  block_streambuf(std::istream* source, std::streamoff limit)
   : m_Source(source)
   , m_Buffer(BUFFER_SIZE+PUTBACK)
   , m_Start(source->tellg())
@@ -69,7 +74,8 @@ protected:
 
     if (eback()==base)
     {
-      std::memmove(base,egptr()-PUTBACK,PUTBACK);
+      std::copy(egptr()-PUTBACK,egptr(),base);
+      //std::memmove(base,egptr()-PUTBACK,PUTBACK);
       start+=PUTBACK;
     }
     std::streamsize to_read=m_Buffer.size()-(start-base);
@@ -101,9 +107,10 @@ size_t        ResourceFile::get_size(const xstring& resource_name)
 {
   if (m_Filename.empty())
   {
-    std::ifstream f(resource_name, std::ios::in | std::ios::binary);
-    f.seekg(0, std::ios::end);
-    return size_t(f.tellg());
+    SDL_RWops* rw = SDL_RWFromFile(resource_name, "rb");
+    size_t res=size_t(SDL_RWsize(rw));
+    SDL_RWclose(rw);
+    return res;
   }
   rsc_map::iterator it = m_Resources.find(resource_name);
   if (it == m_Resources.end()) return 0;
@@ -111,30 +118,18 @@ size_t        ResourceFile::get_size(const xstring& resource_name)
   return r.size;
 }
 
-istream_ptr ResourceFile::get(const xstring& resource_name)
+SDL_RWops* ResourceFile::get(const xstring& resource_name)
 {
   if (m_Filename.empty())
   {
-    std::ifstream* f=new std::ifstream(resource_name.c_str(),std::ios::in|std::ios::binary);
-    if (f->fail()) 
-    {
-      delete f;
-      THROW ("File not found: "+resource_name);
-    }
-    return istream_ptr(f);
+    return SDL_RWFromFile(resource_name, "rb");
   }
   rsc_map::iterator it=m_Resources.find(resource_name);
   if (it==m_Resources.end()) return 0;
   Resource& r=it->second;
-  std::ifstream* f=new std::ifstream(m_Filename.c_str(),std::ios::in|std::ios::binary);
-  if (f->fail())
-  {
-    delete f;
-    THROW ("File not found: "+m_Filename);
-  }
-  f->seekg(r.position);
-  std::istream* is=new owner_istream(new block_streambuf(f,r.size));
-  return istream_ptr(is);
+  SDL_RWops* rw = SDL_RWFromFile(m_Filename, "rb");
+  SDL_RWseek(rw, r.position, RW_SEEK_SET);
+  return rw;
 }
 
 
@@ -218,40 +213,26 @@ int SDLCALL istream_close(struct SDL_RWops *context)
 
 
 
-
-SDL_RWops *SDL_RWFromStream(istream_ptr input)
-{
-  SDL_RWops *rwops = SDL_AllocRW();
-  if (!rwops) return 0;
-  rwops->hidden.unknown.data1=input.get();
-  rwops->seek=istream_seek;
-  rwops->read=istream_read;
-  rwops->write=istream_write;
-  rwops->close=istream_close;
-  return rwops;
-}
-
 bool        read_contents(const xstring& name, char_vec& cv)
 {
   ResourceFile* rf = get_default_resource_file();
-  istream_ptr is;
+  SDL_RWops* rw = 0;
   int size = 0;
   if (rf) 
   {
     size = rf->get_size(name);
-    is=rf->get(name);
-    if (!is) return false;
+    rw = rf->get(name);
+    if (!rw) return false;
   }
   else
   {
-    is=istream_ptr(new std::ifstream(name.c_str(), std::ios::in | std::ios::binary));
-    if (is->fail()) return false;
-    is->seekg(0, std::ios::end);
-    size = int(is->tellg());
-    is->seekg(0);
+    rw = SDL_RWFromFile(name, "rb");
+    size = int(SDL_RWsize(rw));
+    SDL_RWseek(rw, 0, RW_SEEK_SET);
   }
   cv.resize(size);
-  is->read(&cv.front(),size);
+  SDL_RWread(rw, &cv[0], 1, size);
+  SDL_RWclose(rw);
   return true;
 }
 
@@ -277,6 +258,7 @@ void handle_xml_eol(xstring& s)
 xml_element* load_xml(const xstring& name)
 {
   xstring cfg=read_contents_as_string(name);
+  //if (name.ends_with(".xml")) display_message("Loaded ("+name+"): " + cfg);
   if (cfg.empty())
     THROW("Not found: " << name);
   handle_xml_eol(cfg);

@@ -50,7 +50,7 @@ unsigned get_tick_count()
 
 #endif
 
-#ifdef LINUX
+#if defined(LINUX) || defined(__ANDROID__)
 
 #include <dlfcn.h>
 
@@ -78,6 +78,18 @@ function get_function_address(module_handle handle, const char* name)
   return f;
 }
 
+unsigned get_tick_count()
+{
+  struct timeval  tv;
+  gettimeofday(&tv, NULL);
+  unsigned t = (tv.tv_sec) * 1000 + (tv.tv_usec) / 1000;
+  return t;
+}
+
+#endif
+
+#ifdef LINUX
+
 void display_message(const xstring& msg)
 {
   std::cout << msg << std::endl;
@@ -85,6 +97,21 @@ void display_message(const xstring& msg)
 
 #endif
 
+
+#ifdef __ANDROID__
+
+#include <android/log.h>
+
+#define APPNAME "NDK"
+
+void display_message(const xstring& msg)
+{
+  const char* cmsg=msg.c_str();
+  __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, cmsg, 1);
+}
+
+
+#endif
 
 
 class DLLManager
@@ -110,11 +137,18 @@ public:
     if (it==m_Modules.end())
     {
       module_handle m=load_library(module_name.c_str());
-      if (!m) return 0;
+      if (!m)
+      {
+        display_message("Cannot open library: " + module_name);
+        return 0;
+      }
       m_Modules[module_name]=Module(m);
       it=m_Modules.find(module_name);
     }
-    return get_function(it->second,func_name);
+    function f = get_function(it->second, func_name);
+    if (!f)
+      display_message("Cannot find function '" + func_name + "' in module " + module_name);
+    return f;
   }
 private:
   friend class std::auto_ptr<DLLManager>;

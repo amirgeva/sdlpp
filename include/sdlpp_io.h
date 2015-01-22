@@ -47,7 +47,7 @@ public:
 
   /** Returns a dynamically allocated stream to read the resource requested.
       Caller must delete the stream when done. */
-  istream_ptr get(const xstring& resource_name);
+  SDL_RWops*  get(const xstring& resource_name);
 
   /** Return the size (in bytes) of the resource */
   size_t      get_size(const xstring& resource_name);

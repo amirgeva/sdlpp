@@ -27,6 +27,8 @@ void EventManager::poll()
 {
   SDL_Event e;
   int rc=1;
+  iVec2 pos;
+  dVec2 dpos;
   while (rc)
   {
     //SDL_JoystickUpdate();
@@ -85,6 +87,14 @@ void EventManager::poll()
         case SDL_JOYBUTTONUP:			/* Joystick button released */
           m_Joysticks[e.jbutton.which].buttons[e.jbutton.button]=false;
           break;
+        case SDL_FINGERDOWN:
+        case SDL_FINGERMOTION:
+          pos=Graphics::instance()->position(e.tfinger.x,e.tfinger.y);
+          m_Touches[e.tfinger.fingerId]=pos;
+          break;
+        case SDL_FINGERUP:
+        	m_Touches.erase(e.tfinger.fingerId);
+        	break;
         case SDL_QUIT:			/* User-requested quit */
           break;
         case SDL_SYSWMEVENT:			/* System specific event */
@@ -100,7 +110,15 @@ void EventManager::poll()
       }
     }
   }
+}
 
+bool EventManager::touching_rect(const iRect2& rect) const
+{
+  for(const auto& t : m_Touches)
+  {
+	if (rect.contains(t.second)) return true;
+  }
+  return false;
 }
 
 bool EventManager::is_pressed(SDL_Keycode key)

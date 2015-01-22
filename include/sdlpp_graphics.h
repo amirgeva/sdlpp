@@ -63,9 +63,9 @@ namespace SDLPP
 
     Uint32 get_pitch() const { return m_Surface->pitch; }
 
-    const Uint32* get_buffer() const 
+    const Uint8* get_buffer() const 
     { 
-      return reinterpret_cast<const Uint32*>(m_Surface->pixels);
+      return reinterpret_cast<const Uint8*>(m_Surface->pixels);
     }
   };
 
@@ -105,11 +105,12 @@ namespace SDLPP
 
     const Uint32* get_row(int y) const
     {
-      const Uint32* buffer = m_Pixels->get_buffer();
+      const Uint8* buffer = m_Pixels->get_buffer();
       Uint32 pitch = get_pitch();
       buffer += pitch*(m_Region.tl.y+y);
-      buffer += m_Region.tl.x;
-      return buffer;
+      const Uint32* row = reinterpret_cast<const Uint32*>(buffer);
+      row += m_Region.tl.x;
+      return row;
     }
 
     Uint32 get_pitch() const { return m_Pixels->get_pitch(); }
@@ -161,13 +162,7 @@ namespace SDLPP
       return ptr.get();
     }
 
-    void initialize(int width, int height, bool full_screen)
-    {
-      m_Window = SDL_CreateWindow("SDL", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_RESIZABLE);
-      m_Screen = SDL_GetWindowSurface(m_Window);
-      if (!m_Screen) THROW("Invalid graphics format");
-      m_Renderer = SDL_CreateRenderer(m_Window, -1, 0);
-    }
+    void initialize(int width, int height, bool full_screen);
   
     virtual void shutdown() override
     {
@@ -175,7 +170,8 @@ namespace SDLPP
 
     SDL_Surface* convert(SDL_Surface* surface)
     {
-      return SDL_ConvertSurface(surface, m_Screen->format, 0);
+      return surface;
+      //return SDL_ConvertSurface(surface, m_Screen->format, 0);
     }
 
     SDL_Texture* create_texture(SDL_Surface* surface)
@@ -185,7 +181,13 @@ namespace SDLPP
 
     void draw(SDL_Texture* texture, const iRect2& src, const iRect2& dst)
     {
-      SDL_RenderCopy(m_Renderer, texture,&R(src),&R(dst));
+      SDL_Rect rsrc=R(src),rdst=R(dst);
+      SDL_RenderCopy(m_Renderer, texture,&rsrc,&rdst);
+    }
+
+    void render(SDL_Texture* texture)
+    {
+    	SDL_RenderCopy(m_Renderer, texture,0,0);
     }
 
     void fill(Uint32 color)
@@ -198,22 +200,21 @@ namespace SDLPP
       SDL_SetRenderDrawColor(m_Renderer,r,g,b,a);
     }
 
-    void flip()
-    {
-      SDL_RenderPresent(m_Renderer);
-      SDL_RenderClear(m_Renderer);
-    }
+    void flip();
     
+    iVec2 position(float x, float y) const;
   private:
     friend struct std::default_delete<Graphics>;
-    Graphics() {}
+    Graphics() { display_message("Initializing Graphics Manager"); }
     ~Graphics() {}
     Graphics(const Graphics&) {}
     Graphics& operator= (const Graphics&) { return *this; }
 
+    iVec2         m_Size;
     SDL_Window*   m_Window;
     SDL_Surface*  m_Screen;
     SDL_Renderer* m_Renderer;
+    SDL_Texture*  m_BackBuffer;
   };
   
   inline Uint32 MapRGB(int r, int g, int b)

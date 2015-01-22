@@ -1,6 +1,5 @@
 #include <sdlpp.h>
 #include <sysdep.h>
-//#include <SDL_sound.h>
 #include <mp3decode.h>
 
 
@@ -36,22 +35,39 @@ namespace {
 
 
 namespace SDL_sound {
-  class MP3DecoderWrapper
+  
+  class MP3DecoderWrapper : public Singleton
   {
+  public:
+    static MP3DecoderWrapper* instance()
+    {
+      static std::unique_ptr<MP3DecoderWrapper> ptr(new MP3DecoderWrapper);
+      return ptr.get();
+    }
+  
+    virtual void shutdown() override
+    {
+    }
+    
+    MP3Decoder* create()
+    {
+      if (!create_mp3_decoder) return 0;
+      return create_mp3_decoder();
+    }
+  private:
+    friend struct std::default_delete<MP3DecoderWrapper>;
+    MP3DecoderWrapper() 
+    {
+      create_mp3_decoder = (create_func)get_function("mp3decode", "create_mp3_decoder");
+    }
+    ~MP3DecoderWrapper() {}
+    MP3DecoderWrapper(const MP3DecoderWrapper&) {}
+    MP3DecoderWrapper& operator= (const MP3DecoderWrapper&) { return *this; }
+
     typedef MP3Decoder* (*create_func)();
     create_func create_mp3_decoder;
-  public:
-    MP3DecoderWrapper()
-    {
-      create_mp3_decoder=(create_func)get_function("mp3decode","create_mp3_decoder");
-    }
-
-    MP3Decoder* create() 
-    { 
-      if (!create_mp3_decoder) return 0;
-      return create_mp3_decoder(); 
-    }
-  } Wrapper;
+  };
+  
 }
 
 
@@ -61,13 +77,13 @@ SoundClip::SoundClip(const xstring& filename)
   ResourceFile* rf = get_default_resource_file();
   if (rf && !filename.empty())
   {
-    istream_ptr is=rf->get(filename);
-    if (!is) 
+    SDL_RWops* rw=rf->get(filename);
+    if (!rw) 
       THROW ("Resource not found: "+filename);
-    load(is);
+    load_from_rwop(rw,filename);
   }
   else
-  if (!filename.empty()) load(filename);
+    THROW("Resource not found: " + filename);
 }
 
 SoundClip::~SoundClip()
@@ -83,16 +99,6 @@ void SoundClip::destroy()
     m_Wave = 0;
   }
   m_Buffer.clear();
-}
-
-void SoundClip::load(istream_ptr is)
-{
-  load_from_rwop(SDL_RWFromStream(is),"");
-}
-
-void SoundClip::load(const xstring& filename)
-{
-  load_from_rwop(SDL_RWFromFile(filename.c_str(), "rb"),filename.c_str());
 }
 
 void SoundClip::load_from_rwop(SDL_RWops* rwops, const char* name)
@@ -122,12 +128,6 @@ void SoundClip::load_from_rwop(SDL_RWops* rwops, const char* name)
   }
 }
 
-// void SoundClip::play(bool loop)
-// {
-//   SoundManager::instance()->play(*this,loop);
-// }
-// 
-
 ////////////////////////////////////////////////////////////////////
 
 SoundStream::SoundStream(const xstring& filename)
@@ -136,19 +136,13 @@ SoundStream::SoundStream(const xstring& filename)
   if (!filename.empty()) load(filename);
 }
 
-SoundStream::SoundStream(istream_ptr is)
-: m_Data(new Data(BUFFER_SIZE*2*FRAMES))
-{
-  if (is) load(is);
-}
-
 SoundStream::SoundStream(ResourceFile& rf, const xstring& name)
 : m_Data(new Data(BUFFER_SIZE*2*FRAMES))
 {
-  istream_ptr is=rf.get(name);
-  if (!is) 
-    THROW ("Resource not found: "+name);
-  load(is);
+  SDL_RWops* rw=rf.get(name);
+  if (!rw) 
+    THROW ("Resource not found: " << name);
+  load_from_rwop(rw,name);
   //delete is;
 }
 
@@ -167,8 +161,6 @@ void SoundStream::destroy()
 {
   delete[] m_Data->m_Buffer;
   m_Data->m_Buffer=0;
-  if (m_Data->m_DataStream) 
-    m_Data->m_DataStream.reset();
   //if (m_Data->m_State.sample) SDL_sound::Wrapper.free_sample(m_Data->m_State);
   if (m_Data->m_Decoder) m_Data->m_Decoder->destroy();
   delete m_Data;
@@ -215,7 +207,7 @@ Uint8* SoundStream::get_frame(int bytes)
 int SoundStream::decode_thread()
 {
   int rc=0;
-  m_Data->m_Decoder=SDL_sound::Wrapper.create();
+  m_Data->m_Decoder=SDL_sound::MP3DecoderWrapper::instance()->create();
   if (!m_Data->m_Decoder)
   {
     if (flog) *flog << "Could not create decoder.\n";
@@ -290,19 +282,8 @@ void SoundStream::load_from_rwop(SDL_RWops* rwops, const char* name)
 
 void SoundStream::load(const xstring& filename)
 {
-  m_Data->m_DataStream.reset(new std::ifstream(filename.c_str(),std::ios::in|std::ios::binary));
-  if (m_Data->m_DataStream->fail()) 
-  {
-    m_Data->m_DataStream.reset();
-    THROW("File not found: " + filename);
-  }
-  load(m_Data->m_DataStream);
-}
-
-void SoundStream::load(istream_ptr is)
-{
-  m_Data->m_DataStream=is;
-  load_from_rwop(SDL_RWFromStream(is),"");
+  SDL_RWops* rw = SDL_RWFromFile(filename, "rb");
+  load_from_rwop(rw,filename);
 }
 
 

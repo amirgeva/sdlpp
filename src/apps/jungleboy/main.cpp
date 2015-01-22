@@ -128,36 +128,91 @@ void generate_floors(int screen)
   }
 }
 
+#define aMAIN int a_main(int argc, char* argv[])
+
+aMAIN
+{
+	if (SDL_Init(SDL_INIT_VIDEO) != 0){
+		display_message("SDL_Init Error");
+		return 1;
+	}
+	SDL_Window *win = SDL_CreateWindow("Hello World!", 100, 100, 640, 480, SDL_WINDOW_SHOWN);
+	if (win == nullptr){
+		display_message("SDL_CreateWindow Error");
+		SDL_Quit();
+		return 1;
+	}
+	SDL_Renderer *ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (ren == nullptr){
+		SDL_DestroyWindow(win);
+		display_message("SDL_CreateRenderer Error");
+		SDL_Quit();
+		return 1;
+	}
+	SDL_Surface *bmp = SDL_LoadBMP("rsc/rboy.bmp");
+	if (bmp == nullptr){
+		SDL_DestroyRenderer(ren);
+		SDL_DestroyWindow(win);
+		display_message("SDL_LoadBMP Error");
+		SDL_Quit();
+		return 1;
+	}
+	SDL_Rect r={0,0,bmp->w,bmp->h};
+	SDL_Texture *tex = SDL_CreateTextureFromSurface(ren, bmp);
+	SDL_FreeSurface(bmp);
+	if (tex == nullptr){
+		SDL_DestroyRenderer(ren);
+		SDL_DestroyWindow(win);
+		display_message("SDL_CreateTextureFromSurface Error");
+		SDL_Quit();
+		return 1;
+	}
+	SDL_RenderClear(ren);
+	SDL_RenderCopy(ren, tex, NULL, &r);
+	SDL_RenderPresent(ren);
+    SDL_Delay(5000);
+
+    SDL_DestroyTexture(tex);
+    SDL_DestroyRenderer(ren);
+    SDL_DestroyWindow(win);
+    SDL_Quit();
+    return 0;
+}
+
+#define C { display_message(__FILE__+xstring(":")+xstring(__LINE__)); }
 
 MAIN
 {
-  xml_element* cfg_doc=load_xml_from_file("config.xml");
   bool full_screen=false;
+  if (0)
   {
-    xml_element* el=find_descendant(cfg_doc,"screen");
-    if (el)
-    {
-      xstring s=el->get_attribute("full");
-      full_screen=(s=="YES");
-    }
+	  xml_element* cfg_doc=load_xml_from_file("config.xml");
+	  {
+	    xml_element* el=find_descendant(cfg_doc,"screen");
+	    if (el)
+	    {
+	      xstring s=el->get_attribute("full");
+	      full_screen=(s=="YES");
+	    }
+	  }
+	  {
+	    xml_element* el=find_descendant(cfg_doc,"difficulty");
+	    if (el)
+	    {
+	      xstring s=el->get_attribute("easy");
+	      g_easy=(s=="YES");
+	    }
+	  }
+	  {
+	    xml_element* el=find_descendant(cfg_doc,"joystick");
+	    if (el)
+	    {
+	      xstring s=el->get_attribute("enable");
+	      g_only_keyboard=!(s=="YES");
+	    }
+	  }
+	  delete cfg_doc;
   }
-  {
-    xml_element* el=find_descendant(cfg_doc,"difficulty");
-    if (el)
-    {
-      xstring s=el->get_attribute("easy");
-      g_easy=(s=="YES");
-    }
-  }
-  {
-    xml_element* el=find_descendant(cfg_doc,"joystick");
-    if (el)
-    {
-      xstring s=el->get_attribute("enable");
-      g_only_keyboard=!(s=="YES");
-    }
-  }
-  delete cfg_doc;
   
   try
   {
@@ -216,7 +271,7 @@ MAIN
           try {
             advance(dt);
           } catch (...) {}
-          Graphics::instance()->fill(MapRGB(0, 128, 255));
+          Graphics::instance()->fill(MapRGB(255, 128, 0));
           {
             std::ostringstream os;
             os << "Lives: " << g_lives;

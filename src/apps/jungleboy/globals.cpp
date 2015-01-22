@@ -12,6 +12,6 @@ bool g_game_over=false;
 int  g_food_left=0;
 int  g_lives=3;
 int  g_score=0;
-bool g_easy=false;
+bool g_easy=true;
 bool g_only_keyboard=false;
 

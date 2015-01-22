@@ -38,8 +38,6 @@ public:
 private:
   void destroy();
   void load_from_rwop(SDL_RWops* rwops, const char* name);
-  void load(const xstring& filename);
-  void load(istream_ptr is);
   friend class SoundManager;
   uint8_vec m_Buffer;
   Uint8*    m_Wave;
@@ -62,8 +60,6 @@ class SoundStream
 public:
   /** Construct a sound stream and optionally load it from a file. */
   SoundStream(const xstring& filename="");
-  /** Construct a sound Stream by decoding audio from an input stream. */
-  SoundStream(istream_ptr is);
   /** Construct a sound Stream by decoding audio from resource file. */
   SoundStream(ResourceFile& rf, const xstring& name);
   virtual ~SoundStream();
@@ -84,7 +80,6 @@ protected:
 private:
   void load_from_rwop(SDL_RWops* rwops, const char* name);
   void load(const xstring& filename);
-  void load(istream_ptr is);
   friend class SoundManager;
   friend struct SoundStream_Thread;
 
@@ -96,7 +91,7 @@ private:
   struct Data
   {
     Data(int size)
-      : m_DataStream(0),
+      : //m_DataStream(0),
         m_Source(0),
         m_Decoder(0),
         m_Buffer(new Uint8[size]),
@@ -107,7 +102,6 @@ private:
         m_Finished(false),
         m_ThreadDone(false)
     {}
-    istream_ptr          m_DataStream;
     SDL_RWops*           m_Source;
     //Sound_State          m_State;
     MP3Decoder*          m_Decoder;

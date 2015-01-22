@@ -4,6 +4,46 @@
 namespace SDLPP
 {
 
+  void Graphics::initialize(int width, int height, bool full_screen)
+  {
+	m_Size=iVec2(width,height);
+	display_message("Creating display "+xstring(width)+"x"+xstring(height));
+	SDL_DisplayMode dm;
+	if (SDL_GetDesktopDisplayMode(0, &dm) != 0)
+	  THROW("SDL_GetDesktopDisplayMode failed");
+    m_Window = SDL_CreateWindow("SDL", 0, 0, dm.w, dm.h, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS );
+    if (!m_Window)
+      THROW("Failed to create window");
+    SDL_SetWindowFullscreen(m_Window, SDL_TRUE);
+    m_Renderer = SDL_CreateRenderer(m_Window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
+    if (!m_Renderer)
+      THROW("Failed to create renderer");
+    m_BackBuffer = SDL_CreateTexture(m_Renderer,SDL_GetWindowPixelFormat(m_Window),
+	                                 SDL_TEXTUREACCESS_TARGET,width,height);
+	if (!m_BackBuffer) THROW("Failed to create back buffer");
+    SDL_SetRenderTarget(m_Renderer,m_BackBuffer);
+    //m_Screen = SDL_GetWindowSurface(m_Window);
+    //if (!m_Screen) THROW("Invalid graphics format");
+  }
+
+  iVec2 Graphics::position(float x, float y) const
+  {
+	return iVec2(int(x*m_Size.x),int(y*m_Size.y));
+  }
+
+
+  void Graphics::flip()
+  {
+    //display_message("Flipping...");
+	SDL_SetRenderTarget(m_Renderer, NULL);
+	SDL_RenderCopy(m_Renderer,m_BackBuffer,0,0);
+    SDL_RenderPresent(m_Renderer);
+    SDL_RenderClear(m_Renderer);
+    SDL_SetRenderTarget(m_Renderer,m_BackBuffer);
+    SDL_RenderClear(m_Renderer);
+  }
+
+
   void BitmapPixels::draw(const iRect2& src, const iRect2& dst)
   {
     if (!m_Texture) m_Texture = Graphics::instance()->create_texture(m_Surface);
@@ -91,7 +131,8 @@ namespace SDLPP
     loaded = ldr(rwops);
     SDL_FreeRW(rwops);
     if (!loaded) THROW("Image file cannot be loaded: " + name);
-    return Graphics::instance()->convert(loaded);
+    return loaded;
+    //return Graphics::instance()->convert(loaded);
   }
 
   bool BitmapLoader::load(const xstring& name, Bitmap& bmp)
@@ -100,6 +141,7 @@ namespace SDLPP
     if (read_contents(name, v))
     {
       SDL_Surface* s = load_bitmap(SDL_RWFromConstMem(&v[0], v.size()), "");
+      //display_message("Loaded bitmap "+name+"  "+xstring(s->w)+"x"+xstring(s->h));
       bmp = Bitmap(bitmap_pixels_ptr(new BitmapPixels(s)));
       return true;
     }

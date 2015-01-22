@@ -41,7 +41,7 @@ class EventManager : public Singleton
 public:
   static EventManager* instance()
   {
-    static std::auto_ptr<EventManager> ptr(new EventManager);
+    static std::unique_ptr<EventManager> ptr(new EventManager);
     return ptr.get();
   }
 
@@ -64,9 +64,11 @@ public:
     return m_Joysticks[i];
   }
 
+  bool touching_rect(const iRect2& rect) const;
+
   void shutdown();
 private:
-  friend class std::auto_ptr<EventManager>;
+  friend struct std::default_delete<EventManager>;
   EventManager() : m_KeysState(1024,0), m_MouseButtons(32,false)
   {
     init_joysticks();
@@ -82,6 +84,7 @@ private:
   listener_map          m_Listeners;
   std::vector<bool>     m_MouseButtons;
   std::vector<Joystick> m_Joysticks;
+  std::map<int,iVec2>   m_Touches;
   std::list<Uint16>     m_KeyQueue;
 };
 

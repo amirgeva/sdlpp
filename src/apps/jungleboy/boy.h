@@ -176,7 +176,10 @@ public:
         if (is_pressed(SDL_Keycode(SDLK_1+i))) m_EffectPress=i+1;
     }
     int act_seq=get_active_sequence();
-    if ((is_pressed(SDLK_UP) || is_pressed(SDLK_KP_8) || is_joy(0,-1)) && m_OnGround>0)
+    bool left_touch=EventManager::instance()->touching_rect(iRect2(0,400,80,480));
+    bool right_touch=EventManager::instance()->touching_rect(iRect2(560,400,640,480));
+    bool up_touch=EventManager::instance()->touching_rect(iRect2(0,320,640,400));
+    if ((is_pressed(SDLK_UP) || is_pressed(SDLK_KP_8) || is_joy(0,-1) || up_touch) && m_OnGround>0)
     {
       set_velocity(dVec2(get_velocity().x,-200));
       set_acceleration(dVec2(0,get_acceleration().y));
@@ -188,7 +191,7 @@ public:
         set_active_sequence(act_seq==1?5:6);
     }
     else
-    if ((is_pressed(SDLK_RIGHT) || is_pressed(SDLK_KP_6) || is_joy(1,0)) && m_OnGround>0)
+    if ((is_pressed(SDLK_RIGHT) || is_pressed(SDLK_KP_6) || is_joy(1,0) || right_touch) && m_OnGround>0)
     {
       m_LastRight=true;
       set_active_sequence(0);
@@ -199,7 +202,7 @@ public:
         set_acceleration(dVec2(0,get_acceleration().y));
     }
     else
-    if ((is_pressed(SDLK_LEFT) || is_pressed(SDLK_KP_4) || is_joy(-1,0)) && m_OnGround>0)
+    if ((is_pressed(SDLK_LEFT) || is_pressed(SDLK_KP_4) || is_joy(-1,0) || left_touch) && m_OnGround>0)
     {
       m_LastRight=false;
       set_active_sequence(2);
