@@ -133,11 +133,20 @@ namespace SDLPP
 
   class BitmapCache : public Cache<Bitmap>
   {
+    typedef Cache<Bitmap> super;
   public:
     static BitmapCache* instance()
     {
       static std::unique_ptr<BitmapCache> ptr(new BitmapCache);
       return ptr.get();
+    }
+
+    Bitmap& load(const xstring& name, Uint32 color_key)
+    {
+      if (is_loaded(name)) return super::get(name);
+      Bitmap& b = super::get(name);
+      b.set_colorkey(color_key);
+      return b;
     }
 
   private:
@@ -164,9 +173,7 @@ namespace SDLPP
 
     void initialize(int width, int height, bool full_screen);
   
-    virtual void shutdown() override
-    {
-    }
+    virtual void shutdown() override;
 
     SDL_Surface* convert(SDL_Surface* surface)
     {
@@ -190,36 +197,44 @@ namespace SDLPP
     	SDL_RenderCopy(m_Renderer, texture,0,0);
     }
 
+    void fill(Uint8 r, Uint8 g, Uint8 b)
+    {
+      SDL_SetRenderDrawColor(m_Renderer, r, g, b, 255);
+    }
+
     void fill(Uint32 color)
     {
       Uint8 r, g, b, a;
-      a = (color >> 24);
-      r = (color >> 16);
-      g = (color >>  8);
-      b = (color & 255);
+      a = (color >> 24) & 0xFF;
+      r = (color >> 16) & 0xFF;
+      g = (color >>  8) & 0xFF;
+      b =  color        & 0xFF;
       SDL_SetRenderDrawColor(m_Renderer,r,g,b,a);
     }
 
+    Uint32 MapRGB(int r, int g, int b);
     void flip();
     
     iVec2 position(float x, float y) const;
   private:
     friend struct std::default_delete<Graphics>;
-    Graphics() { display_message("Initializing Graphics Manager"); }
+    Graphics() {}
     ~Graphics() {}
     Graphics(const Graphics&) {}
     Graphics& operator= (const Graphics&) { return *this; }
 
-    iVec2         m_Size;
-    SDL_Window*   m_Window;
-    SDL_Surface*  m_Screen;
-    SDL_Renderer* m_Renderer;
-    SDL_Texture*  m_BackBuffer;
+    iVec2            m_Size;
+    SDL_Window*      m_Window;
+    SDL_Surface*     m_Screen;
+    SDL_Renderer*    m_Renderer;
+    SDL_Texture*     m_BackBuffer;
+    SDL_PixelFormat* m_ScreenFormat;
   };
   
   inline Uint32 MapRGB(int r, int g, int b)
   {
-    return 0xFF000000 | ((r & 255) << 16) | ((g & 255) << 8) | (b & 255);
+    return Graphics::instance()->MapRGB(r, g, b);
+    //return 0xFF000000 | ((r & 255) << 16) | ((g & 255) << 8) | (b & 255);
   }
 
   inline void flip() { Graphics::instance()->flip(); }

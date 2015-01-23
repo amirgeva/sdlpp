@@ -168,7 +168,7 @@ bool SpriteLoader::load(const xstring& name, Sprite& s)
       if (frame->get_type()!="Frame") continue;
       xstring image_name=frame->get_attribute("Image");
       xstring rect_str=frame->get_attribute("Rect");
-      Bitmap base_image=BitmapCache::instance()->get(image_name);
+      Bitmap base_image=BitmapCache::instance()->load(image_name,color_key);
       Bitmap image;
       if (!rect_str.empty())
       {
@@ -179,7 +179,7 @@ bool SpriteLoader::load(const xstring& name, Sprite& s)
         image=base_image;
       //if (rf) image=Bitmap(*rf,image_name);
       //else image=Bitmap(image_name);
-      image.set_colorkey(color_key);
+      //image.set_colorkey(color_key);
       int duration=atoi(frame->get_attribute("Duration").c_str());
       s.add_animation_frame(seq_id,image,duration);
     }

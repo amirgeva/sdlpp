@@ -174,6 +174,11 @@ namespace SDLPP {
       clear();
     }
 
+    bool is_loaded(const xstring& name) const
+    {
+      return m_Objects.count(name) > 0;
+    }
+
     T& get(const xstring& name)
     {
       auto it = m_Objects.find(name);

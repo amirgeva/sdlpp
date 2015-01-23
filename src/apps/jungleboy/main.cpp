@@ -226,6 +226,7 @@ MAIN
     SDL_Delay(500);
     //Bitmap& screen=GraphicsManager::instance()->get_screen();
     GameView gv(640,480);
+    Bitmap bg = BitmapCache::instance()->get("rsc/bg.bmp");
     SDL_ShowCursor(SDL_DISABLE);
     srand(SDL_GetTicks());
     //SoundStream music(g_ResourceFile,"rsc/time-to-go.mp3");
@@ -257,7 +258,8 @@ MAIN
           if (g_game_over)
           {
             poll();
-            Graphics::instance()->fill(MapRGB(0, 128, 255));
+            //Graphics::instance()->fill(MapRGB(0, 128, 255));
+            bg.draw(iRect2(0, 0, 640, 480));
             get_font("rsc/arcade.ttf",120).draw(10,200,"Game Over",MapRGB(0,0,255),-640);
             flip();
             SDL_Delay(10);
@@ -271,7 +273,8 @@ MAIN
           try {
             advance(dt);
           } catch (...) {}
-          Graphics::instance()->fill(MapRGB(255, 128, 0));
+          //Graphics::instance()->fill(MapRGB(0, 128, 255));
+          bg.draw(iRect2(0, 0, 640, 480));
           {
             std::ostringstream os;
             os << "Lives: " << g_lives;

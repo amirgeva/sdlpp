@@ -131,6 +131,20 @@ inline void make_lower(xstring& s)
   }
 }
 
+inline xstring hexstr(unsigned n)
+{
+  static const xstring hex="0123456789ABCDEF";
+  xstring res;
+  for(int i=0;i<8;++i)
+  {
+    res+=hex.substr(n&15,1);
+    n>>=4;
+  }
+  std::reverse(res.begin(),res.end());
+  return res;
+}
+
+
 namespace std 
 {
   template<>

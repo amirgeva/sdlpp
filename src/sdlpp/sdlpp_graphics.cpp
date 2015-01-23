@@ -6,24 +6,39 @@ namespace SDLPP
 
   void Graphics::initialize(int width, int height, bool full_screen)
   {
-	m_Size=iVec2(width,height);
-	display_message("Creating display "+xstring(width)+"x"+xstring(height));
-	SDL_DisplayMode dm;
-	if (SDL_GetDesktopDisplayMode(0, &dm) != 0)
-	  THROW("SDL_GetDesktopDisplayMode failed");
+    m_Size = iVec2(width, height);
+    //display_message("Creating display " + xstring(width) + "x" + xstring(height));
+    SDL_DisplayMode dm;
+    if (SDL_GetDesktopDisplayMode(0, &dm) != 0)
+      THROW("SDL_GetDesktopDisplayMode failed");
     m_Window = SDL_CreateWindow("SDL", 0, 0, dm.w, dm.h, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_BORDERLESS );
     if (!m_Window)
       THROW("Failed to create window");
-    SDL_SetWindowFullscreen(m_Window, SDL_TRUE);
+    //SDL_SetWindowFullscreen(m_Window, SDL_TRUE);
     m_Renderer = SDL_CreateRenderer(m_Window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
     if (!m_Renderer)
       THROW("Failed to create renderer");
-    m_BackBuffer = SDL_CreateTexture(m_Renderer,SDL_GetWindowPixelFormat(m_Window),
-	                                 SDL_TEXTUREACCESS_TARGET,width,height);
-	if (!m_BackBuffer) THROW("Failed to create back buffer");
-    SDL_SetRenderTarget(m_Renderer,m_BackBuffer);
-    //m_Screen = SDL_GetWindowSurface(m_Window);
-    //if (!m_Screen) THROW("Invalid graphics format");
+    m_BackBuffer = SDL_CreateTexture(m_Renderer, SDL_GetWindowPixelFormat(m_Window),
+                                     SDL_TEXTUREACCESS_TARGET, width, height);
+    if (!m_BackBuffer) THROW("Failed to create back buffer");
+    SDL_SetRenderTarget(m_Renderer, m_BackBuffer);
+    {
+      Uint32 format;
+      int access, w, h;
+      SDL_QueryTexture(m_BackBuffer, &format, &access, &w, &h);
+      m_ScreenFormat = SDL_AllocFormat(format);
+      if (0)
+      {
+        std::ostringstream os;
+        os << "Format  shifts: " << int(m_ScreenFormat->Rshift) << ","
+    	   << int(m_ScreenFormat->Gshift) << "," << int(m_ScreenFormat->Bshift);
+    	display_message(os.str());
+      }
+    }
+  }
+
+  void Graphics::shutdown()
+  {
   }
 
   iVec2 Graphics::position(float x, float y) const
@@ -35,14 +50,21 @@ namespace SDLPP
   void Graphics::flip()
   {
     //display_message("Flipping...");
-	SDL_SetRenderTarget(m_Renderer, NULL);
-	SDL_RenderCopy(m_Renderer,m_BackBuffer,0,0);
+    SDL_SetRenderTarget(m_Renderer, NULL);
+    SDL_RenderCopy(m_Renderer,m_BackBuffer,0,0);
     SDL_RenderPresent(m_Renderer);
     SDL_RenderClear(m_Renderer);
     SDL_SetRenderTarget(m_Renderer,m_BackBuffer);
     SDL_RenderClear(m_Renderer);
   }
 
+  Uint32 Graphics::MapRGB(int r, int g, int b)
+  {
+    Uint32 color=SDL_MapRGB(m_ScreenFormat,r,g,b);
+    //color|=0xFF000000;
+    //display_message("Mapping "+xstring(r)+","+xstring(g)+","+xstring(b)+"  to  "+hexstr(color));
+    return color;
+  }
 
   void BitmapPixels::draw(const iRect2& src, const iRect2& dst)
   {

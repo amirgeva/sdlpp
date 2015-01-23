@@ -79,13 +79,13 @@ private:
 
   typedef std::multimap<SDL_EventType, EventListener*> listener_map;
   typedef std::vector<char> key_vec;
-  iVec2                 m_MousePosition;
-  key_vec               m_KeysState;
-  listener_map          m_Listeners;
-  std::vector<bool>     m_MouseButtons;
-  std::vector<Joystick> m_Joysticks;
-  std::map<int,iVec2>   m_Touches;
-  std::list<Uint16>     m_KeyQueue;
+  iVec2                    m_MousePosition;
+  key_vec                  m_KeysState;
+  listener_map             m_Listeners;
+  std::vector<bool>        m_MouseButtons;
+  std::vector<Joystick>    m_Joysticks;
+  std::map<Sint64,iVec2>   m_Touches;
+  std::list<Uint16>        m_KeyQueue;
 };
 
 #define LISTEN_FOR_EVENT(x) EventManager::instance()->register_listener(x,this)
