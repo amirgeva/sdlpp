@@ -181,7 +181,7 @@ aMAIN
 
 #define C { display_message(__FILE__+xstring(":")+xstring(__LINE__)); }
 
-MAIN
+int main(int argc, char* argv[])
 {
   bool full_screen=false;
   if (0)

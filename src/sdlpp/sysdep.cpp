@@ -52,6 +52,7 @@ unsigned get_tick_count()
 
 #if defined(LINUX) || defined(__ANDROID__)
 
+#include <sys/time.h>
 #include <dlfcn.h>
 
 #define module_handle void*

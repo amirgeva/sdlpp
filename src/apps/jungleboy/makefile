@@ -1,11 +1,12 @@
 CC=g++
 DEBUG=-O2
 PROJ=jungleboy
-CFLAGS=-c $(DEBUG) -std=c++11 -DLINUX -I ../../../include -I /usr/include/SDL
-LFLAGS=$(DEBUG) -L/usr/lib -L../../../src -lsdlpp -lSDL -lSDL_image -lSDL_ttf -lSDLmain -ldl
+CFLAGS=-c $(DEBUG) -std=c++11 -DLINUX -I ../../../include -I /usr/include/SDL2
+LFLAGS=$(DEBUG) -L/usr/lib -L../../../out/sdlpp/Release -lsdlpp -lSDL2 -ldl
+# -lSDL_image -lSDL_ttf -lSDLmain -ldl
 OBJS=globals.o jungleboy.o main.o pickup.o 
 
-$(PROJ): $(OBJS) ../../../src/libsdlpp.a
+$(PROJ): $(OBJS)
 	$(CC) -o $(PROJ) $(OBJS) $(LFLAGS)
 
 globals.o: globals.cpp
